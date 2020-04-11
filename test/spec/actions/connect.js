@@ -1,15 +1,17 @@
 describe('iD.actionConnect', function() {
-    it('chooses the first non-new node as the survivor', function() {
+    it('chooses the oldest node as the survivor', function() {
         var graph = iD.coreGraph([
-            iD.osmNode({id: 'a'}),
-            iD.osmNode({id: 'b', version: '1'}),
-            iD.osmNode({id: 'c', version: '1'})
+            iD.osmNode({id: 'n3'}),
+            iD.osmNode({id: 'n-1'}),
+            iD.osmNode({id: 'n2'}),
+            iD.osmNode({id: 'n4'})
         ]);
 
-        graph = iD.actionConnect(['a', 'b', 'c'])(graph);
-        expect(graph.hasEntity('a')).not.to.be.ok;
-        expect(graph.hasEntity('b')).to.be.ok;
-        expect(graph.hasEntity('c')).not.to.be.ok;
+        graph = iD.actionConnect(['n3', 'n-1', 'n2', 'n4'])(graph);
+        expect(graph.hasEntity('n3')).not.to.be.ok;
+        expect(graph.hasEntity('n-1')).not.to.be.ok;
+        expect(graph.hasEntity('n2')).to.be.ok;
+        expect(graph.hasEntity('n4')).not.to.be.ok;
     });
 
     it('chooses the last node as the survivor when all are new', function() {

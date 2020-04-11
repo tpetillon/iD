@@ -1,11 +1,11 @@
 import { actionDeleteNode } from './delete_node';
-import { utilArrayUniq } from '../util';
+import { utilArrayUniq, utilOldestID } from '../util';
 
 
 // Connect the ways at the given nodes.
 //
 // First choose a node to be the survivor, with preference given
-// to an existing (not new) node.
+// to the oldest existing (not new) node.
 //
 // Tags and relation memberships of of non-surviving nodes are merged
 // to the survivor.
@@ -23,11 +23,10 @@ export function actionConnect(nodeIDs) {
         var parents;
         var i, j;
 
-        // Choose a survivor node, prefer an existing (not new) node - #4974
-        for (i = 0; i < nodeIDs.length; i++) {
-            survivor = graph.entity(nodeIDs[i]);
-            if (survivor.version) break;  // found one
-        }
+        // Select the node with the oldest ID as the survivor,
+        // or the last one if there are only new nodes.
+        nodeIDs.reverse();
+        survivor = graph.entity(utilOldestID(nodeIDs));
 
         // Replace all non-surviving nodes with the survivor and merge tags.
         for (i = 0; i < nodeIDs.length; i++) {
@@ -64,11 +63,8 @@ export function actionConnect(nodeIDs) {
         var relations, relation, role;
         var i, j, k;
 
-        // Choose a survivor node, prefer an existing (not new) node - #4974
-        for (i = 0; i < nodeIDs.length; i++) {
-            survivor = graph.entity(nodeIDs[i]);
-            if (survivor.version) break;  // found one
-        }
+        // Select the node with the oldest ID as the survivor.
+        survivor = graph.entity(utilOldestID(nodeIDs));
 
         // 1. disable if the nodes being connected have conflicting relation roles
         for (i = 0; i < nodeIDs.length; i++) {
